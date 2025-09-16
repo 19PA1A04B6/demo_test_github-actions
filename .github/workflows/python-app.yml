@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: '3.10'   # Change to your required version
 
-      # Step 3: Install dependencies (optional)
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -32,3 +32,23 @@ jobs:
       # Step 4: Run your script
       - name: Run Python script
         run: python kkk.py
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build   # runs only after build job succeeds
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Example: Deploy using SSH to server
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /var/www/app
+            git pull origin main
+            systemctl restart myapp
